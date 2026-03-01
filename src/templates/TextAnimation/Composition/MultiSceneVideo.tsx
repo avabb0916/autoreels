@@ -1,13 +1,36 @@
-import {useCurrentFrame, useVideoConfig, interpolate, spring} from 'remotion';
+import {useCurrentFrame, useVideoConfig, interpolate, spring, staticFile, delayRender, continueRender} from 'remotion';
+import {useEffect, useState} from 'react';
+
+interface SceneData {
+  title: string;
+  subtitle: string;
+  duration: number;
+  background?: string;
+  titleColor?: string;
+  subtitleColor?: string;
+  animation?: 'fade' | 'slide' | 'zoom';
+}
 
 interface SceneProps {
   title: string;
   subtitle: string;
   startFrame: number;
   endFrame: number;
+  background?: string;
+  titleColor?: string;
+  subtitleColor?: string;
+  animation?: 'fade' | 'slide' | 'zoom';
 }
 
-const Scene: React.FC<SceneProps> = ({title, subtitle, startFrame, endFrame}) => {
+const Scene: React.FC<SceneProps> = ({
+  title,
+  subtitle,
+  startFrame,
+  endFrame,
+  titleColor = 'white',
+  subtitleColor = 'rgba(255, 255, 255, 0.85)',
+  animation = 'fade',
+}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
 
@@ -32,7 +55,7 @@ const Scene: React.FC<SceneProps> = ({title, subtitle, startFrame, endFrame}) =>
 
   const opacity = Math.min(fadeIn, fadeOut);
 
-  // 标题弹性动画
+  // 标题动画
   const titleSpring = spring({
     frame: sceneFrame,
     fps,
@@ -41,7 +64,16 @@ const Scene: React.FC<SceneProps> = ({title, subtitle, startFrame, endFrame}) =>
     },
   });
 
-  const titleY = interpolate(titleSpring, [0, 1], [50, 0]);
+  let titleY = 0;
+  let titleScale = 1;
+
+  if (animation === 'slide') {
+    titleY = interpolate(titleSpring, [0, 1], [50, 0]);
+  } else if (animation === 'zoom') {
+    titleScale = interpolate(titleSpring, [0, 1], [0.8, 1]);
+  } else {
+    titleY = interpolate(titleSpring, [0, 1], [50, 0]);
+  }
 
   // 副标题延迟动画
   const subtitleSpring = spring({
@@ -52,7 +84,16 @@ const Scene: React.FC<SceneProps> = ({title, subtitle, startFrame, endFrame}) =>
     },
   });
 
-  const subtitleY = interpolate(subtitleSpring, [0, 1], [30, 0]);
+  let subtitleY = 0;
+  let subtitleScale = 1;
+
+  if (animation === 'slide') {
+    subtitleY = interpolate(subtitleSpring, [0, 1], [30, 0]);
+  } else if (animation === 'zoom') {
+    subtitleScale = interpolate(subtitleSpring, [0, 1], [0.8, 1]);
+  } else {
+    subtitleY = interpolate(subtitleSpring, [0, 1], [30, 0]);
+  }
 
   return (
     <div
@@ -72,9 +113,9 @@ const Scene: React.FC<SceneProps> = ({title, subtitle, startFrame, endFrame}) =>
         style={{
           fontSize: 90,
           fontWeight: 'bold',
-          color: 'white',
+          color: titleColor,
           textAlign: 'center',
-          transform: `translateY(${titleY}px)`,
+          transform: `translateY(${titleY}px) scale(${titleScale})`,
           marginBottom: 40,
           lineHeight: 1.2,
         }}
@@ -84,9 +125,9 @@ const Scene: React.FC<SceneProps> = ({title, subtitle, startFrame, endFrame}) =>
       <p
         style={{
           fontSize: 40,
-          color: 'rgba(255, 255, 255, 0.85)',
+          color: subtitleColor,
           textAlign: 'center',
-          transform: `translateY(${subtitleY}px)`,
+          transform: `translateY(${subtitleY}px) scale(${subtitleScale})`,
           lineHeight: 1.4,
         }}
       >
@@ -97,25 +138,50 @@ const Scene: React.FC<SceneProps> = ({title, subtitle, startFrame, endFrame}) =>
 };
 
 export const MultiSceneVideo: React.FC = () => {
-  const scenes = [
-    {title: '一个人，月入200万？', subtitle: 'AI时代的"一人公司"来了', start: 0, end: 300},
-    {title: '你还在用AI', subtitle: '接更多外包、赚更多碎钱？', start: 300, end: 750},
-    {title: '错了！', subtitle: '你在卖时间，不是做生意', start: 750, end: 1200},
-    {title: '真正的高手', subtitle: '从"执行者"升级为"架构师"', start: 1200, end: 2100},
-    {title: '人类：审美+判断', subtitle: 'AI：执行+规模化', start: 2100, end: 2700},
-    {title: '把业务拆成原子单元', subtitle: '让AI自动协作运转', start: 2700, end: 3300},
-    {title: '停止工具焦虑', subtitle: '去打磨你的体系', start: 3300, end: 3600},
-  ];
+  const {fps} = useVideoConfig();
+  const [scenes, setScenes] = useState<SceneData[]>([]);
+  const [handle] = useState(() => delayRender());
+
+  useEffect(() => {
+    // 从 public 目录加载场景数据
+    fetch(staticFile('scenes.json'))
+      .then((res) => res.json())
+      .then((data: SceneData[]) => {
+        setScenes(data);
+        continueRender(handle);
+      })
+      .catch((err) => {
+        console.error('Failed to load scenes:', err);
+        continueRender(handle);
+      });
+  }, [handle]);
+
+  // 计算每个场景的起止帧
+  const scenesWithFrames = scenes.map((scene, index) => {
+    const startFrame = scenes
+      .slice(0, index)
+      .reduce((acc, s) => acc + s.duration * fps, 0);
+    const endFrame = startFrame + scene.duration * fps;
+    return {
+      ...scene,
+      startFrame,
+      endFrame,
+    };
+  });
 
   return (
     <>
-      {scenes.map((scene, index) => (
+      {scenesWithFrames.map((scene, index) => (
         <Scene
           key={index}
           title={scene.title}
           subtitle={scene.subtitle}
-          startFrame={scene.start}
-          endFrame={scene.end}
+          startFrame={scene.startFrame}
+          endFrame={scene.endFrame}
+          background={scene.background}
+          titleColor={scene.titleColor}
+          subtitleColor={scene.subtitleColor}
+          animation={scene.animation}
         />
       ))}
     </>

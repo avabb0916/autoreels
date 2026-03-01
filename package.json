@@ -11,7 +11,13 @@
     "workflow": "node scripts/workflow.js",
     "upgrade": "remotion upgrade"
   },
-  "keywords": ["video", "automation", "remotion", "ai", "short-video"],
+  "keywords": [
+    "video",
+    "automation",
+    "remotion",
+    "ai",
+    "short-video"
+  ],
   "author": "",
   "license": "MIT",
   "type": "commonjs",

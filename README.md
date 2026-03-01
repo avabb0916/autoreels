@@ -36,14 +36,41 @@ cp .env.example .env
 
 ### 3. 准备脚本
 
-创建视频脚本 JSON 文件（参考 `input/script-template.json`）：
+创建视频脚本文件，支持两种格式：
+
+**方式 A：Markdown 格式（推荐）**
+
+创建 `.md` 文件（参考 `input/script-template.md`）：
+
+```markdown
+---
+## 场景标题
+场景副标题
+**时长**: 10秒
+**动画**: fade
+---
+```
+
+**支持的配置选项**：
+- `**时长**` / `**Duration**`: 场景时长（秒）
+- `**动画**` / `**Animation**`: 动画类型（fade/slide/zoom）
+- `**标题颜色**` / `**Title Color**`: 标题文字颜色（CSS 颜色值）
+- `**副标题颜色**` / `**Subtitle Color**`: 副标题文字颜色（CSS 颜色值）
+- `**背景**` / `**Background**`: 场景背景色（CSS 颜色值）
+
+**方式 B：JSON 格式**
+
+创建 `.json` 文件（参考 `input/script-template.json`）：
 
 ```json
 [
   {
     "title": "主标题",
     "subtitle": "副标题",
-    "duration": 10
+    "duration": 10,
+    "animation": "fade",
+    "titleColor": "#FFFFFF",
+    "subtitleColor": "rgba(255, 255, 255, 0.85)"
   }
 ]
 ```
@@ -51,41 +78,100 @@ cp .env.example .env
 ### 4. 生成视频
 
 ```bash
-# 方式一：可视化预览
+# 1. 转换脚本（如果使用 Markdown 格式）
+node scripts/convert-script.js input/script-template.md
+
+# 2. 启动可视化预览
 npm start
 
-# 方式二：直接渲染（未来功能）
-npm run workflow input/your-script.json
+# 3. 在浏览器中预览视频
+# Remotion Studio 会自动打开，你可以实时预览和调整视频
+```
+
+## 使用示例
+
+### 示例 1：基础视频脚本
+
+创建 `input/my-video.md`：
+
+```markdown
+---
+## 欢迎
+这是我的第一个视频
+**时长**: 5秒
+---
+
+## 第二个场景
+添加更多内容
+**时长**: 8秒
+---
+```
+
+转换并预览：
+```bash
+node scripts/convert-script.js input/my-video.md
+npm start
+```
+
+### 示例 2：使用自定义动画
+
+```markdown
+---
+## 标题场景
+使用缩放动画
+**时长**: 6秒
+**动画**: zoom
+---
+
+## 内容场景
+使用滑动动画
+**时长**: 10秒
+**动画**: slide
+---
+```
+
+### 示例 3：自定义颜色
+
+```markdown
+---
+## 彩色标题
+这个场景使用金色标题
+**时长**: 8秒
+**标题颜色**: #FFD700
+**副标题颜色**: #FFA500
+**动画**: fade
+---
 ```
 
 ## 使用方法
 
-### 步骤 1：创建脚本
+### 快速开始
 
-用你喜欢的方式创建脚本：
+1. **创建脚本**：编写 Markdown 或 JSON 格式的视频脚本
+2. **转换脚本**：`node scripts/convert-script.js input/your-script.md`
+3. **预览视频**：`npm start` 启动 Remotion Studio
+4. **调整优化**：在 Studio 中实时预览和调整
+5. **渲染输出**：使用 Remotion 渲染最终视频
+
+### 创建脚本的方式
+
+### 创建脚本的方式
 
 **选项 A：用 AI 生成**
 ```
-提示词：将以下内容转换为7个短视频场景，每个场景包含标题和副标题...
+提示词：将以下内容转换为7个短视频场景，每个场景包含标题和副标题，
+使用 Markdown 格式，每个场景用 --- 分隔...
 ```
 
 **选项 B：手动编写**
-复制 `input/script-template.json`，修改内容
+复制 `input/script-template.md`，修改内容
 
 **选项 C：从长文本提炼**
-用 ChatGPT/Claude 提炼关键点，整理成 JSON
-
-### 步骤 2：生成视频
-
-```bash
-# 启动 Remotion Studio 预览
-npm start
-
-# 未来：一键生成
-npm run workflow input/my-script.json
-```
+用 ChatGPT/Claude 提炼关键点，整理成 Markdown 格式
 
 ## 脚本格式
+
+### 基础格式
 
 ```json
 [
@@ -97,9 +183,30 @@ npm run workflow input/my-script.json
 ]
 ```
 
-- `title`: 主标题（大字体）
-- `subtitle`: 副标题（小字体）
-- `duration`: 场景时长（秒）
+### 完整格式（支持所有选项）
+
+```json
+[
+  {
+    "title": "场景标题",
+    "subtitle": "场景副标题",
+    "duration": 10,
+    "animation": "fade",
+    "titleColor": "#FFFFFF",
+    "subtitleColor": "rgba(255, 255, 255, 0.85)",
+    "background": "#667eea"
+  }
+]
+```
+
+**字段说明**：
+- `title`: 主标题（大字体）- 必填
+- `subtitle`: 副标题（小字体）- 必填
+- `duration`: 场景时长（秒）- 必填
+- `animation`: 动画类型（fade/slide/zoom）- 可选，默认 fade
+- `titleColor`: 标题颜色 - 可选，默认白色
+- `subtitleColor`: 副标题颜色 - 可选，默认半透明白色
+- `background`: 场景背景色 - 可选，使用视频默认背景
 
 ## 项目结构
 
@@ -177,7 +284,10 @@ npm run workflow input/my-video.json  # 渲染（未来）
 
 - [x] 基础视频生成
 - [x] 音频集成
-- [ ] 从 JSON 加载场景
+- [x] 从 JSON 加载场景
+- [x] Markdown 脚本支持
+- [x] 自定义动画类型（fade/slide/zoom）
+- [x] 自定义颜色配置
 - [ ] ElevenLabs 语音生成
 - [ ] 一键渲染工作流
 - [ ] 更多视频模板
