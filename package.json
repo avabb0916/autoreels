@@ -1,0 +1,30 @@
+{
+  "name": "autoreels",
+  "version": "1.0.0",
+  "description": "Automated short video generation system powered by Remotion and AI",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render AutoReels output/video.mp4",
+    "render": "node scripts/render-video.js",
+    "voice": "node scripts/generate-voice.js",
+    "workflow": "node scripts/workflow.js",
+    "upgrade": "remotion upgrade"
+  },
+  "keywords": ["video", "automation", "remotion", "ai", "short-video"],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@remotion/cli": "^4.0.431",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.431"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
+  }
+}

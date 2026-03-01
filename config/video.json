@@ -1,0 +1,7 @@
+{
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "durationInFrames": 3600,
+  "backgroundColor": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+}
