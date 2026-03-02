@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "remotion studio",
-    "build": "remotion render SocialMediaVideo output/video.mp4",
+    "build": "remotion render SocialMediaVideoWithAudio output/video.mp4",
     "render": "node scripts/render-video.js",
     "voice": "node scripts/generate-voice.js",
     "workflow": "node scripts/workflow.js",
