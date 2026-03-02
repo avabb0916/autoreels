@@ -1,21 +1,54 @@
 {
   "metadata": {
-    "template": "SimpleSlideshow",
-    "platform": "YouTube",
-    "theme": "dark"
+    "template": "TextAnimation",
+    "platform": "TikTok"
   },
   "scenes": [
     {
-      "title": "First Slide",
-      "subtitle": "Welcome to YouTube dimensions (16:9)!",
-      "duration": 5,
+      "title": "测试 1：基础功能",
+      "subtitle": "这是基础测试",
+      "duration": 5
+    },
+    {
+      "title": "测试 2：Fade 动画",
+      "subtitle": "淡入淡出效果",
+      "duration": 6,
+      "animation": "fade"
+    },
+    {
+      "title": "测试 3：Slide 动画",
+      "subtitle": "从下方滑入",
+      "duration": 6,
       "animation": "slide"
     },
     {
-      "title": "Conclusion",
-      "subtitle": "This uses the SimpleSlideshow Template!",
-      "duration": 4,
+      "title": "测试 4：Zoom 动画",
+      "subtitle": "缩放效果",
+      "duration": 6,
       "animation": "zoom"
+    },
+    {
+      "title": "测试 5：自定义颜色",
+      "subtitle": "金色标题和橙色副标题",
+      "duration": 7,
+      "titleColor": "#FFD700",
+      "subtitleColor": "#FFA500",
+      "animation": "zoom"
+    },
+    {
+      "title": "测试 6：绿色文字",
+      "subtitle": "使用绿色主题",
+      "duration": 6,
+      "titleColor": "#00FF00",
+      "subtitleColor": "#90EE90",
+      "animation": "slide"
+    },
+    {
+      "title": "测试完成",
+      "subtitle": "所有功能测试通过！",
+      "duration": 5,
+      "titleColor": "#FFFFFF",
+      "animation": "fade"
     }
   ]
 }

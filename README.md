@@ -36,14 +36,21 @@ cp .env.example .env
 
 ### 3. 准备脚本
 
-创建视频脚本文件，支持两种格式：
+创建视频脚本文件，支持两种核心结构：
 
-**方式 A：Markdown 格式（推荐）**
+**方式 A：Markdown 格式（推荐，已升级支持全局配置）**
 
-创建 `.md` 文件（参考 `input/script-template.md`）：
+Markdown 文件不仅可以包含场景，在顶部还可以增加 **Frontmatter (元数据区)** 来声明本脚本使用的视觉模板和发布的平台分辨率。
+
+创建 `.md` 文件（参考 `input/multi-platform.md`）：
 
 ```markdown
 ---
+template: SimpleSlideshow   # 使用的视觉模板：SimpleSlideshow 或 TextAnimation
+platform: YouTube           # 目标分发平台：TikTok(9:16), YouTube(16:9), InstagramPost(4:5) 等
+theme: dark                 # 扩展字段：可选
+---
+
 ## 场景标题
 场景副标题
 **时长**: 10秒
@@ -51,28 +58,39 @@ cp .env.example .env
 ---
 ```
 
-**支持的配置选项**：
+**支持的 Frontmatter 全局配置：**
+- `template`: 用于切换整体视频的展示风格，默认提供 `TextAnimation` 与 `SimpleSlideshow`。
+- `platform`: 决定导出视频的分辨率（长宽比）。支持：`TikTok`, `Shorts`, `Reels`, `YouTube`, `Bilibili`, `InstagramPost`。
+
+**单场景配置选项**：
 - `**时长**` / `**Duration**`: 场景时长（秒）
-- `**动画**` / `**Animation**`: 动画类型（fade/slide/zoom）
+- `**动画**` / `**Animation**`: 动画进入退出类型（fade/slide/zoom）
 - `**标题颜色**` / `**Title Color**`: 标题文字颜色（CSS 颜色值）
 - `**副标题颜色**` / `**Subtitle Color**`: 副标题文字颜色（CSS 颜色值）
-- `**背景**` / `**Background**`: 场景背景色（CSS 颜色值）
+- `**背景**` / `**Background**`: 场景独立背景色（CSS 颜色值）
 
 **方式 B：JSON 格式**
 
-创建 `.json` 文件（参考 `input/script-template.json`）：
+如果你希望直接生成底层 JSON 给引擎：
+创建 `.json` 文件：
 
 ```json
-[
-  {
-    "title": "主标题",
-    "subtitle": "副标题",
-    "duration": 10,
-    "animation": "fade",
-    "titleColor": "#FFFFFF",
-    "subtitleColor": "rgba(255, 255, 255, 0.85)"
-  }
-]
+{
+  "metadata": {
+    "template": "SimpleSlideshow",
+    "platform": "TikTok"
+  },
+  "scenes": [
+    {
+      "title": "主标题",
+      "subtitle": "副标题",
+      "duration": 10,
+      "animation": "fade",
+      "titleColor": "#FFFFFF",
+      "subtitleColor": "rgba(255, 255, 255, 0.85)"
+    }
+  ]
+}
 ```
 
 ### 4. 生成视频
