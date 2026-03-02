@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "template": "SimpleSlideshow",
+    "platform": "YouTube",
+    "theme": "dark"
+  },
+  "scenes": [
+    {
+      "title": "First Slide",
+      "subtitle": "Welcome to YouTube dimensions (16:9)!",
+      "duration": 5,
+      "animation": "slide"
+    },
+    {
+      "title": "Conclusion",
+      "subtitle": "This uses the SimpleSlideshow Template!",
+      "duration": 4,
+      "animation": "zoom"
+    }
+  ]
+}

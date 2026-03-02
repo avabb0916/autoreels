@@ -1,5 +1,5 @@
 import {AbsoluteFill} from 'remotion';
-import {MultiSceneVideo} from './Composition/MultiSceneVideo';
+import {MultiSceneVideo} from './templates/TextAnimation/Composition/MultiSceneVideo';
 
 export const Video: React.FC = () => {
   return (

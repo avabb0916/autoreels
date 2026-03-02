@@ -1,5 +1,5 @@
-import {useCurrentFrame, useVideoConfig, interpolate, spring, staticFile, delayRender, continueRender} from 'remotion';
-import {useEffect, useState} from 'react';
+import { useCurrentFrame, useVideoConfig, interpolate, spring, staticFile, delayRender, continueRender } from 'remotion';
+import { useEffect, useState } from 'react';
 
 interface SceneData {
   title: string;
@@ -32,7 +32,7 @@ const Scene: React.FC<SceneProps> = ({
   animation = 'fade',
 }) => {
   const frame = useCurrentFrame();
-  const {fps} = useVideoConfig();
+  const { fps } = useVideoConfig();
 
   const sceneFrame = frame - startFrame;
   const sceneDuration = endFrame - startFrame;
@@ -138,16 +138,16 @@ const Scene: React.FC<SceneProps> = ({
 };
 
 export const MultiSceneVideo: React.FC = () => {
-  const {fps} = useVideoConfig();
+  const { fps } = useVideoConfig();
   const [scenes, setScenes] = useState<SceneData[]>([]);
   const [handle] = useState(() => delayRender());
 
   useEffect(() => {
     // 从 public 目录加载场景数据
-    fetch(staticFile('scenes.json'))
+    fetch(staticFile('scriptData.json'))
       .then((res) => res.json())
-      .then((data: SceneData[]) => {
-        setScenes(data);
+      .then((data) => {
+        setScenes(data.scenes || []);
         continueRender(handle);
       })
       .catch((err) => {

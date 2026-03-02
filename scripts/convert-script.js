@@ -9,10 +9,42 @@ const fs = require('fs');
 const path = require('path');
 
 function parseMarkdownScript(content) {
-  const scenes = [];
+  const result = {
+    metadata: {
+      template: 'TextAnimation', // default
+      platform: 'TikTok',        // default
+    },
+    scenes: [],
+  };
 
-  // 按 --- 分割场景
-  const blocks = content.split(/---+/).filter(block => block.trim());
+  // 尝试匹配 frontmatter YAML (用 --- 封闭的顶部区域)
+  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+
+  let sceneContent = content;
+
+  if (frontmatterMatch) {
+    const frontmatter = frontmatterMatch[1];
+    // 从原始内容中移除 frontmatter 部分，剩下的就是场景部分
+    sceneContent = content.slice(frontmatterMatch[0].length);
+
+    // 简单解析 frontmatter (只处理 key: value)
+    const lines = frontmatter.split('\n');
+    for (const line of lines) {
+      if (line.includes(':')) {
+        const [key, ...valueParts] = line.split(':');
+        const k = key.trim();
+        const v = valueParts.join(':').trim().replace(/['"]/g, ''); // 移除可能的引号
+
+        // 允许可选的主题或其他随意字段
+        if (k) {
+          result.metadata[k] = v;
+        }
+      }
+    }
+  }
+
+  // 按 --- 分割剩余的场景
+  const blocks = sceneContent.split(/---+/).filter(block => block.trim());
 
   for (const block of blocks) {
     const lines = block.trim().split('\n').filter(line => line.trim());
@@ -75,11 +107,11 @@ function parseMarkdownScript(content) {
       if (titleColor) scene.titleColor = titleColor;
       if (subtitleColor) scene.subtitleColor = subtitleColor;
       if (animation) scene.animation = animation;
-      scenes.push(scene);
+      result.scenes.push(scene);
     }
   }
 
-  return scenes;
+  return result;
 }
 
 // 主程序
@@ -99,15 +131,16 @@ if (!fs.existsSync(inputFile)) {
 }
 
 const content = fs.readFileSync(inputFile, 'utf-8');
-const scenes = parseMarkdownScript(content);
+const scriptData = parseMarkdownScript(content);
 
-// 输出到 public/scenes.json
-const outputFile = path.join(__dirname, '../public/scenes.json');
-fs.writeFileSync(outputFile, JSON.stringify(scenes, null, 2));
+// 输出到 public/scriptData.json (为了区分以前单纯包含 scenes 数组的文件)
+const outputFile = path.join(__dirname, '../public/scriptData.json');
+fs.writeFileSync(outputFile, JSON.stringify(scriptData, null, 2));
 
-console.log(`✅ 成功转换 ${scenes.length} 个场景`);
+console.log(`✅ 解析完成! 模板: ${scriptData.metadata.template}, 平台: ${scriptData.metadata.platform}`);
+console.log(`✅ 成功转换 ${scriptData.scenes.length} 个场景`);
 console.log(`📁 输出文件: ${outputFile}`);
 console.log('\n场景预览:');
-scenes.forEach((scene, index) => {
+scriptData.scenes.forEach((scene, index) => {
   console.log(`  ${index + 1}. ${scene.title} (${scene.duration}秒)`);
 });

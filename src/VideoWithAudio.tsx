@@ -1,5 +1,5 @@
-import {AbsoluteFill, Audio, staticFile} from 'remotion';
-import {MultiSceneVideo} from './Composition/MultiSceneVideo';
+import { AbsoluteFill, Audio, staticFile } from 'remotion';
+import { MultiSceneVideo } from './templates/TextAnimation/Composition/MultiSceneVideo';
 
 export const VideoWithAudio: React.FC = () => {
   return (
